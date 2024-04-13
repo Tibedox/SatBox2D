@@ -90,6 +90,8 @@ public class SatBox2D extends ApplicationAdapter {
 
 		// касания
 		Gdx.input.setInputProcessor(new InputProcessor() {
+			final Vector2 startMoveBody = new Vector2();
+			final Vector2 impulse = new Vector2();
 			final DynamicBody[] moveBody = new DynamicBody[1];
 
 			@Override
@@ -114,6 +116,7 @@ public class SatBox2D extends ApplicationAdapter {
 				for(DynamicBody b: ball){
 					if(b.hit(touch.x, touch.y)) {
 						moveBody[0] = b;
+						startMoveBody.set(touch.x, touch.y);
 					}
 				}
 				return false;
@@ -121,6 +124,10 @@ public class SatBox2D extends ApplicationAdapter {
 
 			@Override
 			public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+				touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+				camera.unproject(touch);
+				impulse.set(touch.x-startMoveBody.x, touch.y-startMoveBody.y);
+				moveBody[0].setImpulse(impulse);
 				moveBody[0] = null;
 				return false;
 			}
@@ -132,9 +139,6 @@ public class SatBox2D extends ApplicationAdapter {
 
 			@Override
 			public boolean touchDragged(int screenX, int screenY, int pointer) {
-				touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-				camera.unproject(touch);
-				moveBody[0].setPosition(touch.x, touch.y);
 				return false;
 			}
 
