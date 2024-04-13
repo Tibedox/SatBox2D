@@ -98,6 +98,44 @@ public class DynamicBody {
         shape.dispose();
     }
 
+    public DynamicBody(World world, float x, float y, Polygon p1, Polygon p2) {
+        type = POLY;
+        this.x = x;
+        this.y = y;
+        this.width = p1.getBoundingRectangle().getWidth();
+        this.height = p1.getBoundingRectangle().getHeight();
+
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(x, y);
+
+        body = world.createBody(bodyDef);
+
+        PolygonShape shape1 = new PolygonShape();
+        shape1.set(p1.getVertices());
+
+        FixtureDef fixtureDef1 = new FixtureDef();
+        fixtureDef1.shape = shape1;
+        fixtureDef1.density = 0.3f;
+        fixtureDef1.friction = 0.4f;
+        fixtureDef1.restitution = 0.5f;
+
+        Fixture fixture1 = body.createFixture(fixtureDef1);
+        shape1.dispose();
+
+        PolygonShape shape2 = new PolygonShape();
+        shape2.set(p2.getVertices());
+
+        FixtureDef fixtureDef2 = new FixtureDef();
+        fixtureDef2.shape = shape2;
+        fixtureDef2.density = 0.3f;
+        fixtureDef2.friction = 0.4f;
+        fixtureDef2.restitution = 0.5f;
+
+        Fixture fixture2 = body.createFixture(fixtureDef2);
+        shape2.dispose();
+    }
+
     public float getX() {
         return body.getPosition().x-width/2;
     }
@@ -119,7 +157,7 @@ public class DynamicBody {
     }
 
     public void setPosition(float x, float y) {
-        body.setTransform(x, y, 0);
+        body.setTransform(x, y, body.getAngle());
     }
 
     public boolean hit(float tx, float ty) {

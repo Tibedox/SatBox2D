@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -48,7 +49,7 @@ public class SatBox2D extends ApplicationAdapter {
 		touch = new Vector3();
 		world = new World(new Vector2(0, -9.8f), true);
 		debugRenderer = new Box2DDebugRenderer();
-		//debugRenderer.setDrawVelocities(true);
+		debugRenderer.setDrawVelocities(true);
 
 		imgBrickTexture = new Texture("grass.png");
 		imgBadTexture = new Texture("brick.png");
@@ -68,29 +69,89 @@ public class SatBox2D extends ApplicationAdapter {
 			else if(i<4) {
 				ball[i] = new DynamicBody(world, WORLD_WIDTH / 2 + MathUtils.random(-7, 7), 8 + i, 0.8f, 0.4f);
 			}
-			else {
+			else if(i<8) {
 				Polygon polygon = new Polygon(new float[]{0, 1, 1, -1, -1, -1});
 				for (int j = 0; j < polygon.getVertices().length; j++) {
 					polygon.getVertices()[j] *= 0.5f;
 				}
 				ball[i] = new DynamicBody(world, WORLD_WIDTH / 2 + MathUtils.random(-7, 7), 8 + i, polygon);
+			} else {
+				Polygon polygon1 = new Polygon(new float[]{0, 1, 1, 0, -1, 0});
+				for (int j = 0; j < polygon1.getVertices().length; j++) {
+					polygon1.getVertices()[j] *= 0.5f;
+				}
+				Polygon polygon2 = new Polygon(new float[]{-0.5f, 0, 0.5f, 0, 1, -1, -1, -1});
+				for (int j = 0; j < polygon2.getVertices().length; j++) {
+					polygon2.getVertices()[j] *= 0.5f;
+				}
+				ball[i] = new DynamicBody(world, WORLD_WIDTH / 2 + MathUtils.random(-7, 7), 8 + i, polygon1, polygon2);
 			}
 		}
+
+		// касания
+		Gdx.input.setInputProcessor(new InputProcessor() {
+			final DynamicBody[] moveBody = new DynamicBody[1];
+
+			@Override
+			public boolean keyDown(int keycode) {
+				return false;
+			}
+
+			@Override
+			public boolean keyUp(int keycode) {
+				return false;
+			}
+
+			@Override
+			public boolean keyTyped(char character) {
+				return false;
+			}
+
+			@Override
+			public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+				touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+				camera.unproject(touch);
+				for(DynamicBody b: ball){
+					if(b.hit(touch.x, touch.y)) {
+						moveBody[0] = b;
+					}
+				}
+				return false;
+			}
+
+			@Override
+			public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+				moveBody[0] = null;
+				return false;
+			}
+
+			@Override
+			public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
+				return false;
+			}
+
+			@Override
+			public boolean touchDragged(int screenX, int screenY, int pointer) {
+				touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+				camera.unproject(touch);
+				moveBody[0].setPosition(touch.x, touch.y);
+				return false;
+			}
+
+			@Override
+			public boolean mouseMoved(int screenX, int screenY) {
+				return false;
+			}
+
+			@Override
+			public boolean scrolled(float amountX, float amountY) {
+				return false;
+			}
+		});
 	}
 
 	@Override
 	public void render () {
-		// касания
-		if(Gdx.input.justTouched()){
-			touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-			camera.unproject(touch);
-			for(DynamicBody b: ball){
-				if(b.hit(touch.x, touch.y)) {
-					b.setImpulse(new Vector2(0, 2));
-				}
-			}
-		}
-
 		// события
 		//platform.move();
 
