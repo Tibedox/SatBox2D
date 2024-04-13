@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class SatBox2D extends ApplicationAdapter {
@@ -38,8 +39,9 @@ public class SatBox2D extends ApplicationAdapter {
 	// наши объекты и переменные
 	StaticBody floor;
 	StaticBody wallLeft, wallRight;
+	StaticBody roof;
 	KinematicBody platform;
-	DynamicBody[] ball = new DynamicBody[20];
+	Array<DynamicBody> ball = new Array<>();
 	
 	@Override
 	public void create () {
@@ -47,7 +49,7 @@ public class SatBox2D extends ApplicationAdapter {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, WORLD_WIDTH, WORLD_HEIGHT);
 		touch = new Vector3();
-		world = new World(new Vector2(0, -9.8f), true);
+		world = new World(new Vector2(0, 0f), true);
 		debugRenderer = new Box2DDebugRenderer();
 		debugRenderer.setDrawVelocities(true);
 
@@ -61,8 +63,13 @@ public class SatBox2D extends ApplicationAdapter {
 		floor = new StaticBody(world, 8, 0.6f, 15.5f, 0.8f);
 		wallLeft = new StaticBody(world, 0.6f, 5, 0.5f, 7.6f);
 		wallRight = new StaticBody(world, 15.4f, 5, 0.5f, 7.6f);
+		roof = new StaticBody(world, 8, 8.4f, 14, 0.5f);
 		//platform = new KinematicBody(world, 0, 2.8f, 3, 0.5f);
-		for (int i = 0; i < ball.length; i++) {
+		ball.add(new DynamicBody(world, 2, 4.5f, 0.4f));
+		ball.add(new DynamicBody(world, 11, 4.5f, 0.4f));
+		ball.add(new DynamicBody(world, 12, 5f, 0.4f));
+		ball.add(new DynamicBody(world, 12, 4f, 0.4f));
+		/*for (int i = 0; i < ball.length; i++) {
 			if(i<2) {
 				ball[i] = new DynamicBody(world, WORLD_WIDTH / 2 + MathUtils.random(-7, 7), 8 + i, 0.3f);
 			}
@@ -86,7 +93,7 @@ public class SatBox2D extends ApplicationAdapter {
 				}
 				ball[i] = new DynamicBody(world, WORLD_WIDTH / 2 + MathUtils.random(-7, 7), 8 + i, polygon1, polygon2);
 			}
-		}
+		}*/
 
 		// касания
 		Gdx.input.setInputProcessor(new InputProcessor() {
@@ -126,9 +133,11 @@ public class SatBox2D extends ApplicationAdapter {
 			public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 				touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 				camera.unproject(touch);
-				impulse.set(touch.x-startMoveBody.x, touch.y-startMoveBody.y);
-				moveBody[0].setImpulse(impulse);
-				moveBody[0] = null;
+				if(moveBody[0]!=null) {
+					impulse.set(touch.x - startMoveBody.x, touch.y - startMoveBody.y);
+					moveBody[0].setImpulse(impulse);
+					moveBody[0] = null;
+				}
 				return false;
 			}
 
