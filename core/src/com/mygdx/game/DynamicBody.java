@@ -4,6 +4,7 @@ import static com.mygdx.game.SatBox2D.*;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
@@ -89,7 +90,7 @@ public class DynamicBody {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 0.5f;
+        fixtureDef.density = 0.3f;
         fixtureDef.friction = 0.4f;
         fixtureDef.restitution = 0.5f;
 
@@ -121,11 +122,16 @@ public class DynamicBody {
         body.setTransform(x, y, 0);
     }
 
-    public void hit(float tx, float ty) {
+    public boolean hit(float tx, float ty) {
         for(Fixture f: body.getFixtureList()){
             if(f.testPoint(tx, ty)){
-                body.applyLinearImpulse(0, 2, body.getPosition().x, body.getPosition().y, true);
+                return true;
             }
         }
+        return false;
+    }
+
+    public void setImpulse(Vector2 p) {
+        body.applyLinearImpulse(p, body.getWorldCenter(), true);
     }
 }

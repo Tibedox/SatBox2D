@@ -85,7 +85,9 @@ public class SatBox2D extends ApplicationAdapter {
 			touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 			camera.unproject(touch);
 			for(DynamicBody b: ball){
-				b.hit(touch.x, touch.y);
+				if(b.hit(touch.x, touch.y)) {
+					b.setImpulse(new Vector2(0, 2));
+				}
 			}
 		}
 
