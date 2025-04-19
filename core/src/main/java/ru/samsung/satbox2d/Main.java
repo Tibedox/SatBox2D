@@ -20,6 +20,7 @@ public class Main extends ApplicationAdapter {
     private OrthographicCamera camera;
     private World world;
     private Box2DDebugRenderer debugRenderer;
+    KinematicBody platform;
 
     @Override
     public void create() {
@@ -43,10 +44,19 @@ public class Main extends ApplicationAdapter {
         for (int i = 0; i < box.length; i++) {
             box[i] = new DynamicBodyBox(world, 9+MathUtils.random(-0.1f, 0.1f), 6+i, 0.2f+MathUtils.random(0, 0.3f), 0.2f+MathUtils.random(0, 0.3f));
         }
+
+        platform = new KinematicBody(world, 1, 4f, 3f, 1);
     }
 
     @Override
     public void render() {
+        // события
+        if(platform.body.getPosition().x>WORLD_WIDTH ||
+            platform.body.getPosition().x<0) {
+            platform.vx = -platform.vx;
+            platform.body.setLinearVelocity(platform.vx, 0);
+        }
+            // отрисовка
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
         debugRenderer.render(world, camera.combined);
         batch.setProjectionMatrix(camera.combined);
