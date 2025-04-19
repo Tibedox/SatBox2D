@@ -2,10 +2,12 @@ package ru.samsung.satbox2d;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -31,6 +33,16 @@ public class Main extends ApplicationAdapter {
         StaticBody floor = new StaticBody(world, 8, 1, 15.5f, 0.5f);
         StaticBody wall1 = new StaticBody(world, 1, 5, 0.5f, 6);
         StaticBody wall2 = new StaticBody(world, 15, 5, 0.5f, 6);
+
+        DynamicBodyCircle[] ball = new DynamicBodyCircle[220];
+        for (int i = 0; i < ball.length; i++) {
+            ball[i] = new DynamicBodyCircle(world, 7+MathUtils.random(-0.1f, 0.1f), 6+i, 0.2f+MathUtils.random(0, 0.3f));
+        }
+
+        DynamicBodyBox[] box = new DynamicBodyBox[220];
+        for (int i = 0; i < box.length; i++) {
+            box[i] = new DynamicBodyBox(world, 9+MathUtils.random(-0.1f, 0.1f), 6+i, 0.2f+MathUtils.random(0, 0.3f), 0.2f+MathUtils.random(0, 0.3f));
+        }
     }
 
     @Override
