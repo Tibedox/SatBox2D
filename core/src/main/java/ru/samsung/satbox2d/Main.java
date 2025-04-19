@@ -29,6 +29,8 @@ public class Main extends ApplicationAdapter {
         debugRenderer = new Box2DDebugRenderer();
 
         StaticBody floor = new StaticBody(world, 8, 1, 15.5f, 0.5f);
+        StaticBody wall1 = new StaticBody(world, 1, 5, 0.5f, 6);
+        StaticBody wall2 = new StaticBody(world, 15, 5, 0.5f, 6);
     }
 
     @Override
