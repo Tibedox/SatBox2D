@@ -1,14 +1,19 @@
 package ru.samsung.satbox2d;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 
 public class DynamicBodyTriangle {
     public float x, y;
     public float width, height;
+    Body body;
 
     public DynamicBodyTriangle(World world, float x, float y, float width, float height) {
         this.x = x;
@@ -20,10 +25,10 @@ public class DynamicBodyTriangle {
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(x, y);
 
-        Body body = world.createBody(bodyDef);
+        body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.set(new float[]{-width/2, 0, width/2, 0, 0, height});
+        shape.set(new float[]{0, height/2, -width/2, -height/2, width/2, -height/2});
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -33,5 +38,14 @@ public class DynamicBodyTriangle {
 
         body.createFixture(fixtureDef);
         shape.dispose();
+    }
+    public boolean hit(Vector3 t){
+        Array<Fixture> fixture = body.getFixtureList();
+        for ( Fixture f:fixture) {
+            if (f.testPoint(new Vector2(t.x, t.y))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

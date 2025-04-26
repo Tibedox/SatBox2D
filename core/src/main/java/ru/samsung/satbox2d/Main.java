@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -24,7 +23,9 @@ public class Main extends ApplicationAdapter {
 
     KinematicBody platform;
     KinematicBody platform2;
-    DynamicBodyCircle[] balls = new DynamicBodyCircle[20];
+    DynamicBodyCircle[] balls = new DynamicBodyCircle[2];
+    DynamicBodyTriangle[] triangles = new DynamicBodyTriangle[3];
+    DynamicBodyBox[] boxes = new DynamicBodyBox[4];
 
     @Override
     public void create() {
@@ -41,28 +42,26 @@ public class Main extends ApplicationAdapter {
         StaticBody wall2 = new StaticBody(world, 15, 5, 0.5f, 6);
 
         for (int i = 0; i < balls.length; i++) {
-            balls[i] = new DynamicBodyCircle(world, 7+MathUtils.random(-0.1f, 0.1f), 6+i, 0.2f+MathUtils.random(0, 0.3f));
+            balls[i] = new DynamicBodyCircle(world, 3, 6+i, 0.3f);
         }
 
-        DynamicBodyBox[] box = new DynamicBodyBox[20];
-        for (int i = 0; i < box.length; i++) {
-            box[i] = new DynamicBodyBox(world, 9+MathUtils.random(-0.1f, 0.1f), 6+i, 0.2f+MathUtils.random(0, 0.3f), 0.2f+MathUtils.random(0, 0.3f));
+        for (int i = 0; i < boxes.length; i++) {
+            boxes[i] = new DynamicBodyBox(world, 13, 6+i, 0.4f, 0.8f);
         }
 
-        DynamicBodyTriangle[] triangles = new DynamicBodyTriangle[20];
         for (int i = 0; i < triangles.length; i++) {
             triangles[i] = new DynamicBodyTriangle(world, 8, 5+i, 1, 0.7f);
         }
 
-        platform = new KinematicBody(world, 1, 4f, 5f, 1);
-        platform2 = new KinematicBody(world, 8, 7f, 3f, 0.5f);
+        //platform = new KinematicBody(world, 1, 4f, 5f, 1);
+        //platform2 = new KinematicBody(world, 8, 7f, 3f, 0.5f);
     }
 
     @Override
     public void render() {
         // события
-        platform.move();
-        platform2.move();
+        //platform.move();
+        //platform2.move();
 
         // отрисовка
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
@@ -105,6 +104,16 @@ public class Main extends ApplicationAdapter {
             for (int i = 0; i < balls.length; i++) {
                 if(balls[i].hit(startTouch)){
                     bodyTouched = balls[i].body;
+                }
+            }
+            for (int i = 0; i < boxes.length; i++) {
+                if(boxes[i].hit(startTouch)){
+                    bodyTouched = boxes[i].body;
+                }
+            }
+            for (int i = 0; i < triangles.length; i++) {
+                if(triangles[i].hit(startTouch)){
+                    bodyTouched = triangles[i].body;
                 }
             }
             return false;
