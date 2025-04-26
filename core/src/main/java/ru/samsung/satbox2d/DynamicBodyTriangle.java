@@ -1,21 +1,20 @@
 package ru.samsung.satbox2d;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
-public class DynamicBodyCircle {
+public class DynamicBodyTriangle {
     public float x, y;
-    public float radius;
+    public float width, height;
 
-    public DynamicBodyCircle(World world, float x, float y, float radius) {
+    public DynamicBodyTriangle(World world, float x, float y, float width, float height) {
         this.x = x;
         this.y = y;
-        this.radius = radius;
+        this.width = width;
+        this.height = height;
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -23,16 +22,16 @@ public class DynamicBodyCircle {
 
         Body body = world.createBody(bodyDef);
 
-        CircleShape shape = new CircleShape();
-        shape.setRadius(radius);
+        PolygonShape shape = new PolygonShape();
+        shape.set(new float[]{-width/2, 0, width/2, 0, 0, height});
+
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 0.5f;
         fixtureDef.friction = 0.4f;
-        fixtureDef.restitution = 0.8f;
+        fixtureDef.restitution = 0.1f;
 
         body.createFixture(fixtureDef);
-
         shape.dispose();
     }
 }

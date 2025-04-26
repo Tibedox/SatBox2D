@@ -16,11 +16,14 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class Main extends ApplicationAdapter {
     public static final float WORLD_WIDTH = 16, WORLD_HEIGHT = 9;
+
     private SpriteBatch batch;
     private OrthographicCamera camera;
     private World world;
     private Box2DDebugRenderer debugRenderer;
+
     KinematicBody platform;
+    KinematicBody platform2;
 
     @Override
     public void create() {
@@ -35,28 +38,32 @@ public class Main extends ApplicationAdapter {
         StaticBody wall1 = new StaticBody(world, 1, 5, 0.5f, 6);
         StaticBody wall2 = new StaticBody(world, 15, 5, 0.5f, 6);
 
-        DynamicBodyCircle[] ball = new DynamicBodyCircle[220];
+        DynamicBodyCircle[] ball = new DynamicBodyCircle[20];
         for (int i = 0; i < ball.length; i++) {
             ball[i] = new DynamicBodyCircle(world, 7+MathUtils.random(-0.1f, 0.1f), 6+i, 0.2f+MathUtils.random(0, 0.3f));
         }
 
-        DynamicBodyBox[] box = new DynamicBodyBox[220];
+        DynamicBodyBox[] box = new DynamicBodyBox[20];
         for (int i = 0; i < box.length; i++) {
             box[i] = new DynamicBodyBox(world, 9+MathUtils.random(-0.1f, 0.1f), 6+i, 0.2f+MathUtils.random(0, 0.3f), 0.2f+MathUtils.random(0, 0.3f));
         }
 
-        platform = new KinematicBody(world, 1, 4f, 3f, 1);
+        DynamicBodyTriangle[] triangles = new DynamicBodyTriangle[20];
+        for (int i = 0; i < triangles.length; i++) {
+            triangles[i] = new DynamicBodyTriangle(world, 8, 5+i, 1, 0.7f);
+        }
+
+        platform = new KinematicBody(world, 1, 4f, 5f, 1);
+        platform2 = new KinematicBody(world, 8, 7f, 3f, 0.5f);
     }
 
     @Override
     public void render() {
         // события
-        if(platform.body.getPosition().x>WORLD_WIDTH ||
-            platform.body.getPosition().x<0) {
-            platform.vx = -platform.vx;
-            platform.body.setLinearVelocity(platform.vx, 0);
-        }
-            // отрисовка
+        platform.move();
+        platform2.move();
+
+        // отрисовка
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
         debugRenderer.render(world, camera.combined);
         batch.setProjectionMatrix(camera.combined);
