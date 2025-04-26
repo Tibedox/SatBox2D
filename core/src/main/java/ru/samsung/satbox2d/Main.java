@@ -2,13 +2,13 @@ package ru.samsung.satbox2d;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -24,6 +24,7 @@ public class Main extends ApplicationAdapter {
 
     KinematicBody platform;
     KinematicBody platform2;
+    DynamicBodyCircle[] balls = new DynamicBodyCircle[20];
 
     @Override
     public void create() {
@@ -33,14 +34,14 @@ public class Main extends ApplicationAdapter {
         Box2D.init();
         world = new World(new Vector2(0, -10), true);
         debugRenderer = new Box2DDebugRenderer();
+        Gdx.input.setInputProcessor(new MyInputProcessor());
 
         StaticBody floor = new StaticBody(world, 8, 1, 15.5f, 0.5f);
         StaticBody wall1 = new StaticBody(world, 1, 5, 0.5f, 6);
         StaticBody wall2 = new StaticBody(world, 15, 5, 0.5f, 6);
 
-        DynamicBodyCircle[] ball = new DynamicBodyCircle[20];
-        for (int i = 0; i < ball.length; i++) {
-            ball[i] = new DynamicBodyCircle(world, 7+MathUtils.random(-0.1f, 0.1f), 6+i, 0.2f+MathUtils.random(0, 0.3f));
+        for (int i = 0; i < balls.length; i++) {
+            balls[i] = new DynamicBodyCircle(world, 7+MathUtils.random(-0.1f, 0.1f), 6+i, 0.2f+MathUtils.random(0, 0.3f));
         }
 
         DynamicBodyBox[] box = new DynamicBodyBox[20];
@@ -75,5 +76,70 @@ public class Main extends ApplicationAdapter {
     @Override
     public void dispose() {
         batch.dispose();
+    }
+
+    class MyInputProcessor implements InputProcessor{
+        Vector3 startTouch = new Vector3();
+        Vector3 endTouch = new Vector3();
+        Body bodyTouched;
+
+        @Override
+        public boolean keyDown(int keycode) {
+            return false;
+        }
+
+        @Override
+        public boolean keyUp(int keycode) {
+            return false;
+        }
+
+        @Override
+        public boolean keyTyped(char character) {
+            return false;
+        }
+
+        @Override
+        public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+            startTouch.set(screenX, screenY, 0);
+            camera.unproject(startTouch);
+            for (int i = 0; i < balls.length; i++) {
+                if(balls[i].hit(startTouch)){
+                    bodyTouched = balls[i].body;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+            endTouch.set(screenX, screenY, 0);
+            camera.unproject(endTouch);
+            if(bodyTouched != null) {
+                Vector3 drag = new Vector3(endTouch).sub(startTouch);
+                bodyTouched.applyLinearImpulse(new Vector2(drag.x, drag.y), bodyTouched.getPosition(), true);
+                bodyTouched = null;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean touchDragged(int screenX, int screenY, int pointer) {
+            return false;
+        }
+
+        @Override
+        public boolean mouseMoved(int screenX, int screenY) {
+            return false;
+        }
+
+        @Override
+        public boolean scrolled(float amountX, float amountY) {
+            return false;
+        }
     }
 }
